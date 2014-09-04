@@ -10,23 +10,29 @@ from pygments.lexers import guess_lexer, guess_lexer_for_filename
 
 formatted = None
 progress = 0
+have_matrix = False
 
-def load_random_file():
+def load_random_file(fname= None):
 	global formatted, progress
 
-	files = os.listdir("source")
-	myfile = random.sample(files, 1)[0]
-	with open("source/"+myfile) as thefile:
+	if fname is None:
+		files = os.listdir("source")
+		fname = random.sample(files, 1)[0]
+	with open("source/"+fname) as thefile:
 		content = thefile.read()
 
-	lexer = guess_lexer_for_filename(myfile, content)
+	lexer = guess_lexer_for_filename(fname, content)
 	formatted = highlight(content,lexer,Terminal256Formatter())
 	progress = 0
 
 load_random_file()
 	 
 def send_keystroke(tempo):
-	global progress
+	if tempo == 99 and not have_matrix:
+		sys.stdout.write("\n")
+		load_random_file("../matrix.txt")
+		have_matrix = True
+	global progress, have_matrix
 	if tempo == 0:
 		return
 	next_chars = formatted[progress:progress+tempo]
